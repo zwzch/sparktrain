@@ -574,3 +574,17 @@ reductByKeyAndWindow 仅仅是算子不同
 zs
 ls
     ====> (zs:true)(ls:true)
+
+spark-submit --jars /home/zw/桌面/newiotest/libb/mysql-connector-java-5.1.18.jar  --master local[2]  --class  TransformApp   /home/zw/IdeaProjects/sparktrain/out/artifacts/sparktrain_jar/sparktrain.jar
+
+20160410,zs
+20160410,ls
+20160410,ww
+根据需求 left 保证左边的数据都是全的
+transform + leftjoin 把不要的东西过滤掉
+
+SparkSteaming + Flume
+SparkStreaming Flume-based Approach
+Pull-based Approach using a Custom Sink
+
+SparkStreaming Push Based Flume
