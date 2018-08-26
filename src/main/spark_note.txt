@@ -582,9 +582,45 @@ spark-submit --jars /home/zw/桌面/newiotest/libb/mysql-connector-java-5.1.18.j
 20160410,ww
 根据需求 left 保证左边的数据都是全的
 transform + leftjoin 把不要的东西过滤掉
-
+outleftjoin
 SparkSteaming + Flume
-SparkStreaming Flume-based Approach
+Flume-style Push-based Approach
+flume avro的形式
+push形式 spark先启动
+FlumeUtils.createStream(streamingContext, [chosen machine's hostname], [chosen port])
+
+# list the sources, sinks and channels in the agent
+agent_foo.sources = netcat-source
+agent_foo.sinks = avro-sink
+agent_foo.channels = memory-channel
+
+# set channels for source
+agent_foo.sources.netcat-source.type = netcat
+agent_foo.sources.netcat-source.bind = 127.0.0.1
+agent_foo.sources.netcat-source.type = 44444
+
+agent_foo.sinks.avro-sink.type = avro
+agent_foo.sinks.avro-sink.type = 127.0.0.1
+agent_foo.sinks.avro-sink.type = 41414
+
+agent_foo.channels.memory-channel.type = memory
+
+agent_foo.sources.netcat-source.channels = memory-channel
+agent_foo.sinks.avro-sink.channel = memory-channel
+
+
+<dependency>
+    <groupId>org.apache.spark</groupId>
+    <artifactId>spark-streaming-flume-sink_2.11</artifactId>
+    <version>2.2.0</version>
+</dependency>
+spark-submit --jars  /home/zw/.m2/repository/org/apache/spark/spark-streaming-flume_2.11/2.2.0/spark-streaming-flume_2.11-2.2.0.jar,/home/zw/.m2/repository/org/apache/flume/flume-ng-core/1.6.0/flume-ng-core-1.6.0.jar,/home/zw/.m2/repository/org/apache/flume/flume-ng-sdk/1.6.0/flume-ng-sdk-1.6.0.jar --master local[2]  --class  FlumePushWordCount   /home/zw/IdeaProjects/sparktrain/out/artifacts/sparktrain_jar/sparktrain.jar
+
+bin/flume-ng agent --conf conf --conf-file example.conf --name agent_foo -Dflume.root.logger=INFO,console
+
+
+
+
 Pull-based Approach using a Custom Sink
 
 SparkStreaming Push Based Flume
