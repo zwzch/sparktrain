@@ -654,3 +654,22 @@ agent_foo.sinks.spark.channel = memory-channel
 
 先启动flume 然后启动spark
 mvn -CleanPackage -d
+第二种是有备份的 更可靠的方式
+
+
+SparkStreaming Kafka
+0.8 稳定的
+0.10的集成是不兼容以前版本的 实验性的
+Receiver-based 基于reciver的 出现故障可能丢失数据
+reciver的高级api操作 存储的哦spark executor
+WAL write ahead log 在spark1.2之后推出的 预写日志 防止数据丢失
+spark 关键功能的时间 面试会问
+import KafkaUtils
+可以采用并行的机制
+WAL机制需要有一个多副本的文件系统
+生产环境一般使用 --jars
+
+spark-submit --jars  /home/zw/.m2/repository/org/apache/spark/spark-streaming-kafka-0-8_2.11/2.2.0/spark-streaming-kafka-0-8_2.11-2.2.0.jar  --master local[2]  --class  KafkaReciverWordCount   /home/zw/IdeaProjects/sparktrain/out/artifacts/sparktrain_jar/sparktrain.jar 192.168.56.114:2181,192.168.56.112:2181,192.168.56.113:2181  test test 1
+
+
+DirectApproach 基于director的
