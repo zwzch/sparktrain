@@ -671,5 +671,16 @@ WAL机制需要有一个多副本的文件系统
 
 spark-submit --jars  /home/zw/.m2/repository/org/apache/spark/spark-streaming-kafka-0-8_2.11/2.2.0/spark-streaming-kafka-0-8_2.11-2.2.0.jar  --master local[2]  --class  KafkaReciverWordCount   /home/zw/IdeaProjects/sparktrain/out/artifacts/sparktrain_jar/sparktrain.jar 192.168.56.114:2181,192.168.56.112:2181,192.168.56.113:2181  test test 1
 
+sparkStreaming 监控界面 默认4040 reciver job是一直存在的 挂掉了就没有接受数据的
 
 DirectApproach 基于director的
+通过kafka中偏移量读取来判定如何读取
+是DirectStream
+1.不需要reciver
+2.不需要wal的模式 就可以达到0副本的丢失
+3.能够满足只执行一次 exactly-once 一次语义
+
+缺点 需要自己周期性的向zookeeper中更新数据
+
+spark-submit --jars  /home/zw/.m2/repository/org/apache/spark/spark-streaming-kafka-0-8_2.11/2.2.0/spark-streaming-kafka-0-8_2.11-2.2.0.jar,/home/zw/下载/kafka_2.11-0.9.0.0/libs/kafka_2.11-0.9.0.0.jar,/home/zw/下载/kafka_2.11-0.9.0.0/libs/kafka-clients-0.9.0.0.jar  --master local[2]  --class  KafkaDirectWordCount   /home/zw/IdeaProjects/sparktrain/out/artifacts/sparktrain_jar/sparktrain.jar 192.168.56.111:9092 hello_topic
+
