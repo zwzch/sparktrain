@@ -711,3 +711,45 @@ accesslog 是网站的眼睛 访问者的来源
           分配预算 BI出报表 互联网的
           让直播不卡顿 进来送礼物有日志 弹幕收集日志 统计日志 关联收益
           处理日志的规模变大 机器是否能抗的住 就会产生问题
+
+linux corntab表达式
+tool.lu/crontab
+crontab -e
+*/1 * * * * /home/zw/PycharmProjects/Demo1/runLogs.sh
+
+对接python日志产生器到Flume
+access.log ====> 控制台输出
+    exec
+    memory
+    logger
+
+# Name the components on this agent
+a1.sources = r1
+a1.sinks = k1
+a1.channels = c1
+
+# Describe/configure the source
+a1.sources.r1.type = exec
+a1.sources.r1.command = tail -F /Users/guoxingyu/Documents/work/spark/sql/generate_log/logs/access.log
+a1.sources.r1.shell = /bin/sh -c
+
+# Describe the sink
+a1.sinks.k1.type = org.apache.flume.sink.kafka.KafkaSink
+a1.sinks.k1.topic = streamingtopic
+a1.sinks.k1.brokerList = localhost:9092
+a1.sinks.k1.requiredAcks = 1
+a1.sinks.k1.batchSize = 20
+
+# Use a channel which buffers events in memory
+a1.channels.c1.type = memory
+
+# Bind the source and sink to the channel
+a1.sources.r1.channels = c1
+a1.sinks.k1.channel = c1
+
+bin/flume-ng agent --conf conf --conf-file  --name a1 -Dflume.root.logger=INFO,console
+
+日志 ===> flume====>kafka
+    启动zk
+    启动kafka
+    修改flume配置文件
