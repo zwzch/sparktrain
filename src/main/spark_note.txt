@@ -669,7 +669,7 @@ import KafkaUtils
 WAL机制需要有一个多副本的文件系统
 生产环境一般使用 --jars
 
-spark-submit --jars  /home/zw/.m2/repository/org/apache/spark/spark-streaming-kafka-0-8_2.11/2.2.0/spark-streaming-kafka-0-8_2.11-2.2.0.jar  --master local[2]  --class  KafkaReciverWordCount   /home/zw/IdeaProjects/sparktrain/out/artifacts/sparktrain_jar/sparktrain.jar 192.168.56.114:2181,192.168.56.112:2181,192.168.56.113:2181  test test 1
+spark-submit --jars  /home/zw/.m2/repository/org/apache/spark/spark-streaming-kafka-0-8_2.11/2.2.0/spark-streaming-kafka-0-8_2.11-2.2.0.jar  --master local[2]  --class  KafkaReciverWordCount   /home/zw/IdeaProjects/sparktrain/out/artifacts/sparktrain_jar/sparktrain.jar 192.168.56.114:2181,192.168.56.112:2181,192.168.56.113:2181  test  1
 
 sparkStreaming 监控界面 默认4040 reciver job是一直存在的 挂掉了就没有接受数据的
 
@@ -753,3 +753,32 @@ bin/flume-ng agent --conf conf --conf-file  --name a1 -Dflume.root.logger=INFO,c
     启动zk
     启动kafka
     修改flume配置文件
+
+spark-submit --jars  /home/zw/.m2/repository/org/apache/spark/spark-streaming-kafka-0-8_2.11/2.2.0/spark-streaming-kafka-0-8_2.11-2.2.0.jar,/home/zw/下载/kafka_2.11-0.9.0.0/libs/kafka_2.11-0.9.0.0.jar,/home/zw/下载/kafka_2.11-0.9.0.0/libs/kafka-clients-0.9.0.0.jar  --master local[2]  --class  project.StatStreamingApp   /home/zw/IdeaProjects/sparktrain/out/artifacts/sparktrain_jar/sparktrain.jar /home/zw/IdeaProjects/sparktrain/out/artifacts/sparktrain_jar/sparktrain.jar 192.168.56.114:2181,192.168.56.112:2181,192.168.56.113:2181  streaming_topic  1
+
+spark-submit --jars  /home/zw/.m2/repository/org/apache/spark/spark-streaming-kafka-0-8_2.11/2.2.0/spark-streaming-kafka-0-8_2.11-2.2.0.jar  --master local[2]  --class  project.spark.StatStreamingApp   /home/zw/IdeaProjects/sparktrain/out/artifacts/sparktrain_jar/sparktrain.jar 192.168.56.114:2181,192.168.56.112:2181,192.168.56.113:2181 test streaming_topic  1
+
+
+数据清洗 -----> 从原始日志中解析出需要的日志
+功能1 ： 今天到现在为止实战课程的访问量
+    Spark Streaming把统计结果写入到数据库里
+    可视化前端根据 yyyyMMdd courseid 把数据库的统计结果展示出来
+    RDBMS
+        现有的拿出来 + 下一个批次的统计结构
+    NoSQL：
+        HBSASE 一个API就能搞定
+        clickout + 统计结果
+
+HBase 表设计
+    create 'course_clickcount', 'info'
+RowKey 设计
+    day_courseid
+
+如何使用scala来操作Hbase
+spark-submit --jars  /home/zw/.m2/repository/org/apache/spark/spark-streaming-kafka-0-8_2.11/2.2.0/spark-streaming-kafka-0-8_2.11-2.2.0.jar,/home/zw/IdeaProjects/sparktrain/lib/hbase_lib/hbase-client-0.98.12-hadoop2.jar,/home/zw/hadoop/spark/spark-2.2.0-bin-hadoop2.6/jars/hadoop-common-2.6.5.jar,/home/zw/IdeaProjects/sparktrain/lib/hbase_lib/hbase-common-0.98.12-hadoop2.jar,/home/zw/IdeaProjects/sparktrain/lib/hbase_lib/hbase-protocol-0.98.12-hadoop2.jar,/home/zw/IdeaProjects/sparktrain/lib/hbase_lib/htrace-core-2.04.jar  --master local[2]  --class  project.spark.StatStreamingApp   /home/zw/IdeaProjects/sparktrain/out/artifacts/sparktrain_jar/sparktrain.jar 192.168.56.114:2181,192.168.56.112:2181,192.168.56.113:2181 test streaming_topic  1
+
+功能1 + 从搜索引擎引流过来的
+Hbase表设计
+    create 'crease_serach_clickcount' 'info'
+    设计rowkey
+    20171111+search+1
