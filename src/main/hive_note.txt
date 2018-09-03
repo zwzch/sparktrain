@@ -1,0 +1,52 @@
+Hive 编程指南
+
+hive on EMR
+弹性MapReduce 性价比比较高 对新工具新创意测试
+先使用小实例 使用Ganglia监控性能
+确保EC2实例 键对 安全组 和EMR工作流在同一个区域中
+EMR AWS管理控制台 规模增大 使用其他方式进行搭建
+EMR elastic-mapreduc CLI
+EMR API 缺点可能不够新
+Amazon Thrift端口号是改变的
+EMR 管理者master实例组（namenode jobtracker）
+核心实例组(datanode taskTracker)(集群停止数据丢失) 结点个数不能减少
+任务实例组(task tracker) 可以增加和减少 降低成本又不会丢数据
+
+s3n性能更好
+部署hive-site.xml文件
+安装hive --instal-hive --hive-versions
+安装hive-site 指定文件脚本
+elastice --brotstrapmapreduce 配置内存密集性任务的机器
+
+EMR hive元数据的存储
+1)使用JDBC连接元数据存储
+2）使用初始化脚本 startup.q 或者使用.hiverc自动调用开机启动
+3）在S3上进行Mysql的dump工作
+
+EMR中的HDFS和S3
+中间数据存储在HDFS中 需要持久化的数据再存储到S3中
+数据在s3中的缺点 无法使用hadoop本地化数据处理优化 在处理前就将这些热数据导入到hdfs中 然后在进行处理
+就可以在后续使用hadoop本地的处理优化
+
+用户需要将所有初始化脚本 配置脚本 资源文件 UDF/Streaming 用到的JAR文件上传到S3上
+
+S3上的日志
+elatic-mapreduce下的creentdials.json配置
+--log-uri
+注意要频繁的清除日志 减少产生的存储成本
+
+现买现卖
+1）将中间结果存储到S3中
+2）只把任务实例作为先买现卖结点 可以加快整个工作流
+先买现卖任务可能导致太多次的map失败导致hadoop
+可以通过修改mapred.reduce.max.attempts,mapred.map.max.attempts
+修改任务的最多尝试次数
+依赖太多的现买现卖实例导致无法推测执行或者任务失败
+如果想访问EMR的9100 9101端口 通过ssh 或者同台sock
+
+启动EMRhive对S3文件系统的优化
+set hive.optimize.s3.query=true
+
+alter table xxx recover partitions;
+
+

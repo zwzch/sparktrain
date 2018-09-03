@@ -796,3 +796,5 @@ SpringBoot
 sprintBoot动态获取hbase的数据
 1.代码中写死
 2.在页面上放一个时间插件
+ip解析 获得省份
+userget --->搜索引擎
