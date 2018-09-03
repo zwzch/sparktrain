@@ -782,3 +782,17 @@ Hbase表设计
     create 'crease_serach_clickcount' 'info'
     设计rowkey
     20171111+search+1
+
+SpringBoot
+Echarts 动态 静态
+DataV
+
+为什么需要可视化
+理解数据意义的过程
+可视化可以提高效率
+SpringBoot
+采用了生产级别的Spring程序  约定大于配置
+少写很多配置文件！！！
+sprintBoot动态获取hbase的数据
+1.代码中写死
+2.在页面上放一个时间插件
