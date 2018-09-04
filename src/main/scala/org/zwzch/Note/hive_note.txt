@@ -49,20 +49,4 @@ set hive.optimize.s3.query=true
 
 alter table xxx recover partitions;
 
-Tez有以下几个特色：
-（1） 丰富的数据流接口；
-（2） 扩展性良好的“Input-Processor-Output”运行模型；
-（3） 简化数据部署（充分利用了YARN框架，Tez本身仅是一个客户端编程库，无需事先部署相关服务）
-（4） 性能优于MapReduce
-（5） 优化的资源管理（直接运行在资源管理系统YARN之上）
-（6） 动态生成物理数据流
-
-hive on tez，直接配置hive支持tez，其实是在yarn上面启动一个app,这个app永久运行,接受不同sql，除非退出hive cli此app才会结束
-tez runing app在yarn上面和spark on yarn很类似，而且tez,spark底层原理也很相似！
-在切换底层为mr引擎的时候也会重启app运行，但是tez那个app也没结束，等待mr app运行结束后,两个一起结束！
-
-原本打算自己编译的，发现编译到tez-ui的时候总是报错，除非跳过不使用tez-ui；多次编译都是失败了，暂时先放一边了；直接使用官网已经编译好的包吧；
-
-备注：Tez-ui是一个 Web界面可以看到Job的信息的执行时间，通过它可以更好、更直观的了解到程序慢在哪个位置；
-
 
