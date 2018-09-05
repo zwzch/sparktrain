@@ -99,3 +99,31 @@ hadoop
 单点 伪分布式 分布式
 hive内部是什么
 $HIVE_HOME/lib
+Thrift 提供了了远程访问其他进程
+hive客户端 ---> metastoreservice
+使用Derby数据库是 用户不可以并发两个hiveCLI实例
+derby --> metastore_db
+默认路径是user/hive/warehouse hive.metastore.local hive类路径要有jdbc
+hive --auxpath 允许用户指定以猫号分割的附属的jar包
+--config 指定一个新的配置文件的目录
+set 命令 显示修改变量值
+set, set -v所有变量 hadoop hdfs mapreduce 的属性
+set 还可以给变量赋新的值
+hive --define 定义变量
+hive --define foo=bar --hivevar --define的标记是相同的
+set hivevar:foo=bar;
+create table toss1(i int, ${hivevar:foo} string);
+system: 命名空间 Java可读可写 对env：只能读
+hivevar rw 用户自定义变量
+hiveconf rw Hive相关的配置属性
+system rw  Java定义的配置属性
+env    r    shell环境 bash环境的变量
+hive -e 一次执行命令
+hive -s 静默模式 去掉 ok 和 Time taken等行
+hive -f 执行指定文件中一个多个查询语句 *.q *.hql
+hive shell中可使用source来执行一个脚本文件
+.hiverc 文件中有内容在cli启动前自动执行文件命令
+历史记录在~/.hivehistory
+hiveshell中 !简单的shell命令;
+hiveshell中 dfs -ls / ;更高效的dfs的命令
+set hive.cli.print.header=true cli 打印出字段名称
