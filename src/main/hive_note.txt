@@ -65,4 +65,37 @@ tez runing app在yarn上面和spark on yarn很类似，而且tez,spark底层原�
 
 备注：Tez-ui是一个 Web界面可以看到Job的信息的执行时间，通过它可以更好、更直观的了解到程序慢在哪个位置；
 
+hadoop -->    mapreduce     -->    sql,hql(hive)
+(hdfs)      (特别的计算模型)        (不需要快速出结果)
+限制：
+1）不支持记录级别更新插入删除 由于mapreduce 时间长 hive不支持事务
 
+2) 类似OLAP工具
+   OLTP On-Line Transaction Processing
+   这样做的最大优点是可以即时地处理输入的数据，及时地回答。也称为实时系统(Real time System)。
+   衡量联机事务处理结果的一个重要指标是系统性能，具体体现为实时请求-响应时间(Response Time)，
+   即用户在终端上输入数据之后，到计算机对这个请求给出答复所需要的时间。OLTP是由前台、应用、数据库共同完成的，
+   处理快慢以及处理程度取决于数据库引擎、服务器、应用引擎。OLTP 数据库旨在使事务应用程序仅写入所需的数据，以便尽快处理单个事务。
+   Online Analytical Processing hive 不满足联机部分
+   hadoop+hbase emr/ec2+dynamoDB
+
+Map + Reducer
+map 集合的一种形式到另一种形式
+reudcer 键-值对 输入和输出的键值是不同
+hadoop 备份3份 64M或者倍数
+减少写入读取次数
+input -> mappers -> shuffle(重新分发)/combine(小范围sort)/sort -> reducers -> output
+
+hive cli hwi(网页界面) jdbc odbc thrift
+hive -> job执行计划 -> 执行mapper/reducer模块 hive网关机 -> NameNode
+pig 数据流 步进式的数据流更加直观
+hbase 行级别的数据更新 快速查询 行级事务
+Hbase 只查询部分列会很快
+Hbase 内存缓存技术 + hdfs
+本地文件的内存患处技术 数据更新操作日志
+没有使用mapreduce的工具
+spark（shark） storm kafka
+hadoop
+单点 伪分布式 分布式
+hive内部是什么
+$HIVE_HOME/lib
