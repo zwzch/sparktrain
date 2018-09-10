@@ -127,3 +127,149 @@ hive shell中可使用source来执行一个脚本文件
 hiveshell中 !简单的shell命令;
 hiveshell中 dfs -ls / ;更高效的dfs的命令
 set hive.cli.print.header=true cli 打印出字段名称
+hive 脚本使用--进行注释
+hive 基本数据类型
+TINYINT 1byte
+SMALINT 2byte
+INT 4byte
+BIGINT 8byte
+BOOLEAN true false
+FLOAT 单精度
+DOUBLE 双精度
+STRING 单引号双引号
+TIMESTAMPS UTC时间
+BINARY 字节数组
+对应java中的数据类型
+在Hive宽松的世界里 限制长度并不重要
+BINARY和BLOB并不相同
+cast(s AS INT)
+Hive中支持struct map array
+3种集合数据类型
+struct('John', 'Doe')
+访问使用.字段名
+map('first','JOIN','last','Doe')
+键值对的组合
+数组名['first']
+Array('John','Doe')
+数组名[1]
+进行封装提高吞吐量的数据 最少的头部寻址来提供查询速度
+create table employees (
+    name STRING,
+    salary FLOAT,
+    subordinates Array<STRING>,
+    deductions Map<STRING,FLOAT>,
+    address struct<street:STRING>
+)
+注意struct一旦声明好结构 位置就不会改变
+hive 中默认的记录和字段分割符
+\n 使用文本文件的每行
+^A 8进制编码
+^B map键值对的分割
+^C 键和值的分割
+用户可以使用\t字段分割符
+
+传统数据库是写时模式 schema on write 数据在写入数据库是对模式进行检查 写入时对模式进行检查
+hive 是读时模式 schema on read 不会再数据加载时验证 在查询时进行验证
+
+HiveQL hive 查询语言 hql
+hive 不支持行级插入操作 更新操作和删除操作
+hive 不支持事务
+hive 数据库表是目录命名空间 
+默认default
+create database if not exists financials
+show databases like 'mobula.*' 查询mobula开头的数据库 
+default没有自己的目录  数据库目录是*.db
+hive.metastore.warehouse.dir 表示存储的目录
+describe database 数据库名  查看数据库的描述信息 
+s3n://的性能更好 
+DROP database if exists 数据库名 cascade
+cascade 可以使hive自行先删除数据库中的表
+restrict 则要先删除数据库的目录
+
+alter database test set dbproperties('xxx'='xxx')
+修改数据库的描述信息
+
+create table if not exists 表存在 忽略后面的语句
+hive 两个表属性 last_modified_by 最后修改表的用户名
+last_modified_time 最后一次修改的时间
+show tables in mydb
+describe extended xxx
+describe formatted 格式更加规范
+describe extended 库名.表名.列名
+
+内部表（管理表）hive控制着数据的生命周期
+外部表 表是外部的 删除表不会删除掉数据
+只会删除元数据
+语句中省略掉external 源表是外部表 呢么新表也将是外部表
+
+分区表 提高查询的性能 
+内表 ：分层存储
+set hive.mapred.mode = strict
+set hive.mapred.mode = nonstrict
+strict 表示where中没有分区过滤的化会禁止提交任务
+show partitions 表名
+外部表：可以使用分区 共享数据 优化查询性能
+alter table xxx partition()
+location '';
+动态添加分区
+1.distcp 将分区下的数据拷贝到s3中
+2.修改外部表的分区路径
+3.hadoop fs -rmr path
+删除hdfs中的分区数据
+describe extended 表名 partition ();
+查看分区数据所在的路径
+distcp的优势
+1.执行的分布式特性
+之前在上文中已经提到过,DistCp本身会构造成一个MR的Job.他是一个纯由Map Task构成的Job,注意是没有Reduce过程的.
+所以他能够把集群资源利用起来,集群闲下来的资源越多,他跑的越快.下面是Job的构造过程:
+2.高效的MR组件
+高效的MR组件的意思DistCp在相应的Job时,提供了针对此类型任务的Map Class,InputFormat和OutputFormat,分别是CopyMapper, DynamicInputFormat, CopyOutputFormat.这三者MR设置类型与普通的MR类型有什么区别呢,答案在下面
+通过指定第三方的输入输出格式和Serde 使hive支持其他广泛的文件格式
+
+删除表
+drop table if exists employees
+外部表 不会删除数据
+管理表 表的元数据和表内数据都会被删除
+hadoop 
+/user/$USER/.trash 目录
+fs.trash.interval 可以将间隔设置的合理
+修改表
+alter table 
+操作会修改元数据 不会修改数据本身
+alter table log_messages rename to xxx;
+alter table log_messages add if not exists
+如果没有分区就增加分区
+
+alter table xxx CHANGE COLUMN old_column_name new_column_name column_data_type COMMENT 'column_comment';
+对hive中的某个字段重命名
+
+alter table log_messages add columns()
+在已经有的字段后面增加字段
+
+alter table log_messages replace columns
+替换列位新列
+ replace 的语句只能使用一下两种SerDe的表
+ DynamicSerDe 
+ MetadataTypedColumnsetSerDe
+
+ alter table log_messages partition () set fileformat seqencefile
+ 修改存储格式和Serde属性 
+ 分区表要指定一个新的Serde
+ alter table table_using_JSON set serdeproperties()
+ 向已经存在的SerDe增加新的serdeproperties属性
+ cluster by into bucket 是必选的
+ alter table archive partition 把分区内的文件打成一个HAR文件 建成 NameNode的压力
+ 使用UNARCHIVE 就可以反响操作
+
+如何将数据转载到内部表中 
+load data local inpath ''
+overwrite into table xxx
+partition ();
+目录不存在 先创建分区目录 数据拷贝到目录下
+local 表示的使用的是本地文件系统
+如果没有local是 hadoop中的目录
+全路径会有更好的鲁棒性
+指定了overwrite 会将之前的数据先删除掉
+没有使用overwrite是会将保留文件为文件名_序列号
+使用inpath要注意文件路径下不能有任何文件夹
+hive不会验证内容 但是会验证格式
