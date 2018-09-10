@@ -273,3 +273,187 @@ local 表示的使用的是本地文件系统
 没有使用overwrite是会将保留文件为文件名_序列号
 使用inpath要注意文件路径下不能有任何文件夹
 hive不会验证内容 但是会验证格式
+
+INSERT INTO TABLE schema_name.table_name
+SELECT
+    column_names
+FROM
+    source_schema_name.source_table_name;
+通过查询语句向表中插入数据
+
+hive提供了动态分区的功能 根据查询参数推断分区
+静态分区键必须出现在动态分区之前
+设置动态分区
+set hive.exec.dynamic.partition = true;
+set hive.exec.dynamic.partition.mode = nonstrict
+set hive.exec.max.dynamic.partitions.pernode=1000
+设置期望的属性
+create table xxx AS
+SELECT  column_names
+FROM    table_name;
+通过单个查询语句创建表并加载数据
+
+导出数据 
+格式正确的
+    hadoop fs -cp source_path target_path
+
+或者
+    INSERT DIRECTORY 'path'
+    SELECT
+        column_names
+    FROM
+        source_schema_name.source_table_name;
+导出数据
+数据多少取决于reduce的个数
+
+或者创建一个临时表 将表的存储方式配置成为期望的数据 再从表中查询数据
+tips 临时表要自己删除
+
+HIVE 查询
+SELECT   
+FROM    table_name;
+select sql中的影射算子
+select 表示了从哪个表 视图嵌套查询中选择记录
+from 表示从哪个表 视图 嵌套查询中选择记录
+引用不存在的元素会返回NULL
+STRING 将不再加引号
+map元素可以空arrayp[...] 或者点
+使用正则查询列
+hive 支持所有的典型运算符
+A+B
+A-B
+A * B 
+A/B 
+A%B 按位与
+A|B 按位或
+A^B 按位异或
+～A 按位取反
+数学函数
+round() 近似值
+round(DOUBLE d, int n) 保留n位小数的DOUBLE的近似值
+floor(DOUBLE d) 返回 <=d 的最大BIGINT
+ceil(DOUBLE d)
+ceiling(DOUBLE d) 返回>=d 最小BIGINT
+rand
+rand(int seed) 取随机数
+exp(DOUBLE d)  幂次方
+ln()
+log10()
+log()
+pow(d,p) d 的p次幂
+sqrt()开方
+bin()返回二进制
+hex（）
+unhex()
+conv(a,b,c) 将a从b进制转换成c进制
+abs() 绝对值
+pmod() 取模
+sin()
+asin()
+cos()
+acos()
+positive(INT/DOUBLE) 返回Int型值i
+negative() 返回负数
+聚合函数 多行返回一行的值 groupby
+
+count(*) 计算总行数 有NULL
+count(expr) 提供表达式的非NULL行数
+count(Distinct) 重排后的行数
+sum(col)
+sum(Distinct col)
+avg()
+min()
+max()
+variance(col) 方差
+var_samp() 样本方差
+percentfile_approx()
+collect_set（）col元素从拍后的数组
+set hive.map.aggr = true
+提高聚合性能 触发在map阶段的聚合过程
+表生成函数 
+一列扩充成多列
+explode(Array ) 返回 0到多行的结果
+explode(Map)
+inline(Array) 提取出结构数组出入表中
+json_tuple()
+parse_url_tuple()从url中解析出n个部分的信息
+
+ascii()返回ascii的整数值
+base64()
+binary()转换成二进制
+cast() 失败返回NULL
+concat() 拼接字符春
+concat_ws()使用分割符拼接
+decode()
+encode()
+find_in_set()都好分割的字符串中s出现的位置
+format_number()
+get_json_object()
+xxx in (aaa,bbb)  在元组中返回true
+in_file(String s, String filename) 文件中有匹配的值就返回true
+instr() 子串第一次出现的位置
+length()
+locate(sbustr,str,pos) pos 位置之后子串第一次出现的位置
+lower（）变小写
+lcase（） 同上
+ltrim() 去除左空格
+lpad() 对字符串从左开始填充
+parse_url()
+printf()
+regexp_extract() 抽取正则
+regexp_replace() 正则替换
+repeat(s,n) 输出n次s
+reverse()反转
+rpad()
+rtrim() 
+sentences(s,long ,locale) 字符串转化成句子数组
+size
+space(n) 返回n个空格
+split（）返回分割的数组
+str_to_map()
+substr()
+trim
+unbase64()
+upper()大写
+from_unixtime()时间戳->UTC时间
+unix_timestamp() 当下时间戳
+unix_timestamp(String date)
+to_date(timestamp)
+year
+month
+day 
+hour 
+minute()
+second()
+weekofyear()在一年的第几周中
+datediff()时间相差的天数
+date_sub()
+date_add(String)
+增加多少天
+
+limit 
+列别名
+case when then 
+
+select * 是不需要mapreduce操作的
+set hive.exec.model.local.auto=true 
+hive会尝试用本地模式执行其他的查询
+where 不可以使用列别名 可以用嵌套的select语句
+
+A=B TRUE false
+a <=> b a和b都是NULL 也返回true
+a<>b a!=b a不等于b
+a<b a<=b a>b a>=b
+a [not] between b and c 
+a is NULL 
+A like B  B简单的正则
+A RLIKE B B是java中的正则
+对于浮点数操作 钱要cast成float
+避免窄类型向宽类型的转换
+rlike 是更强大的like
+having（）更简单的过滤了groupby的数据 避免了子查询
+hive 只支持等值连接 pig中可以实现非等值的连接
+inner join 两边都有的数据
+hive 会线缓存左边的表的数据 最后扫描表进行计算 用户要保证 表是从右向左递增的
+hvie提供了一个标记来显示呢个表是最大表
+mapside join
