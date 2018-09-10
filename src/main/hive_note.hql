@@ -457,3 +457,63 @@ inner join 两边都有的数据
 hive 会线缓存左边的表的数据 最后扫描表进行计算 用户要保证 表是从右向左递增的
 hvie提供了一个标记来显示呢个表是最大表
 mapside join
+只有一张表是小表 可以在最大的表mapper时候将小表放入内存中
+map-side JOIN 优化明显快于常规连接操作减少了map reduce的操作
+    set hive.auto.convert.JOIN = true
+    就会在必要的时候启动这个优化
+    set hive.mapjoin.smalltable.filesize=25000000 可以优化的小表的大小
+    右外连接和全外连接不支持优化
+对于分桶数据的优化 
+    set hive.optimize.bucketmapJOIN=true
+    如果分桶表有相同的分桶数 可以执行一个更快的分类-合并连接（sort-merge JOIN）
+    set hive.input.format=org.apache.hadoop.hive.ql.io.BucketizedHiveInputFormat
+    set hive.optimize.bucketmapJOIN=true
+    set hive.optimize.bucketmapJOIN.sortedmerge=true
+order by 对结果集进行全局排序
+sort by 局部排序过程 提高全局排序的效率
+asc 或者是 desc 
+distribute by 来保证具有相同记录分发到同一个reduce中处理 降低不同reduce中输出内容的重复
+cast()函数 round()/
+select (2.0 * cast(cast(b as string) as DOUBLE)) from source_path
+
+抽样查询
+可以使用 rand(bucket 3 out of 10 on rand())
+数据块百分比抽样
+union all 将2个或多个表进行合并
+union 子查询的两个字段都是float类型
+可哟将一个长的复杂的where语句分割未union子查询 源表建立多次拷贝分发
+
+hive  不支持物化视图
+1.使用视图来降低查询复杂度 分割成更小的 更可控的片段 像嵌套子查询
+2.hive的视图不可以保护信息不被随意查询
+3.用于动态分区中的map查询
+视图==》查询语句的固化操作
+create table like
+create view like 
+
+hive 没有键的改奶奶 
+但还是可以建立索引来加速操作 索引存储在另一张表中
+create index xxx on table xxx(filed) as 'org' 索引处理器
+s3的数据不能建立索引
+bitmap 索引处理器 应用与排重后值比较少的列
+可以实现定制化的索引处理器
+
+1.hive中按天划分的表应该用分区表
+2.分区表中的数据大小不应太小 否则会增加jvm开启和销毁的时间
+    最好数据大小是块的若干倍  
+  不好分区可以分桶
+3.hive的去标准化 多用array map struct 函数可以在大数据量的情况下优化执行速度
+4.同一份数据多种处理 
+    from history
+        INSERT OVERWRITE TABLE schema_name.table_name
+        SELECT
+            column_names
+        FROM
+            source_schema_name.source_table_name;
+        INSERT OVERWRITE TABLE schema_name.table_name
+        SELECT
+            column_names
+        FROM
+            source_schema_name.source_table_name;
+    减少数据的扫描
+5 对于每个表的分区 产生临时表对下一个job使用 使用分区 不会产生同步问题
