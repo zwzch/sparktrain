@@ -1,0 +1,67 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <groupId>org.zwzch</groupId>
+    <artifactId>sparktrain</artifactId>
+    <version>1.0</version>
+    <inceptionYear>2008</inceptionYear>
+    <properties>
+
+        <kafka.version>0.9.0.0</kafka.version>
+        <hadoop.version>2.2.0</hadoop.version>
+        <spark.version>2.2.0</spark.version>
+        <scala.version>2.11</scala.version>
+    </properties>
+
+
+
+    <repositories>
+        <repository>
+            <id>cloudera</id>
+            <url>https://repository.cloudera.com/artifactory/cloudera-repos/</url>
+        </repository>
+    </repositories>
+    <dependencies>
+
+    <dependency>
+        <groupId>org.apache.kafka</groupId>
+        <artifactId>kafka_2.10</artifactId>
+        <version>${kafka.version}</version>
+    </dependency>
+        <!-- https://mvnrepository.com/artifact/mysql/mysql-connector-java -->
+
+
+        <dependency>
+            <groupId>org.apache.hadoop</groupId>
+            <artifactId>hadoop-client</artifactId>
+            <version>${hadoop.version}</version>
+        </dependency>
+        <!-- Spark -->
+
+        <dependency>
+            <groupId>org.apache.spark</groupId>
+            <artifactId>spark-streaming-flume_2.11</artifactId>
+            <version>2.2.0</version>
+        </dependency>
+
+
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-lang3</artifactId>
+            <version>3.5</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.apache.spark</groupId>
+            <artifactId>spark-streaming-kafka-0-8_2.11</artifactId>
+            <version>2.2.0</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.flume.flume-ng-clients</groupId>
+            <artifactId>flume-ng-log4jappender</artifactId>
+            <version>1.6.0</version>
+        </dependency>
+    </dependencies>
+
+
+</project>
+
