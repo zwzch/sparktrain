@@ -491,7 +491,7 @@ hive  不支持物化视图
 create table like
 create view like 
 
-hive 没有键的改奶奶 
+hive 没有键的概念
 但还是可以建立索引来加速操作 索引存储在另一张表中
 create index xxx on table xxx(filed) as 'org' 索引处理器
 s3的数据不能建立索引
@@ -517,3 +517,138 @@ bitmap 索引处理器 应用与排重后值比较少的列
             source_schema_name.source_table_name;
     减少数据的扫描
 5 对于每个表的分区 产生临时表对下一个job使用 使用分区 不会产生同步问题
+6.不能合理分区的数据 太多小分区的数据 应该分桶存储
+  按照字段的hash值进行分桶
+hive增加列不可以在中间插入列
+
+列式存储
+    1.重复数据
+    2.多列
+总是使用压缩 压缩使cpu的成本⬆️
+
+
+
+
+
+========》调优
+EXPLAIN 查询语句会打印出语法抽象树
+一个hive包含多个stage  stage plan 冗长复杂
+explain extended  产生更多的输出信息
+
+set hive.limit.optimize.enable=true
+使用limit可以对源数据进行抽样 缺点是有些数据永远不会用到
+join 优化 
+    1.join最小的表放到左边
+    2.足够小的表map-side JOIN
+对于小数量级 可以启用本地模式
+set hive.exec.parallel = true
+开启hive中的并行执行 有可能缩短job运行的时间 但是集群的利用率会增加
+strict模式 
+    1.对分区表必须指定分区
+    2.orderby必须接limit
+    3.限制笛卡尔积
+hive 是按照输入数据量的大小来确定reduce个数的 通过dfs -count 来计算输入量的大小
+hive.exec.reducers.max = 
+防止一个任务耗费太多的reduce资源
+JVM 重用 可以让JVM实例在同一个job中重新使用N次
+缺点是JVM会一直占用到task插槽
+mapred.job.reuse.jvm.num.tasks 
+mapred-site.xml 文件
+索引 加快 groupby 的速度
+
+动态分区可通过简单的select 向分区表中创建很多新的分区
+
+推测执行
+通过加快获取单个task的结果进行侦测 将满的TaskTracker放入黑名单来提升效率
+
+在中配置maperd-site
+
+groupby的优化将查询中的多个group by 组装到单个mapreduce任务中  
+hive.multigogroupby.singlemr
+
+set hive.exec.roeoffset=true
+2 个虚拟列 1)INPUT_FILE_NAME BLOCK_INSIDE_FILE 进行划分的输入文件名 文件的块内偏移量
+
+压缩可以减少磁盘空间存储 提高吞吐量
+BZIP2 压缩率最高
+GZIP
+
+压缩率比较小但是速度快
+LZO
+Snappy
+
+BIp 和 Lzo 提供了块级别的压缩
+开启中间压缩 
+set hive.exec.compress.intermediate=true
+SnappyCodec 比较好的压缩编解码器
+
+sequence file 可以把文件分割成块 然后按块压缩 3个级别 None Record BLOCK
+hive -hiveconf hive.root.logger=DEBUG,console
+hive --help --debug
+PDK
+
+describe function
+describe function extended
+描述函数的信息
+UDF
+UDAF 用户自定义的聚合函数
+lateral view 方便的将 explode 提供的行转列结果集合在一起提供服务
+UDF中@Descripition()是java总的注解
+jar文件是加入到了分布式缓存中
+写udaf时候要注意内存使用问题
+避免通过new生成函数
+udf中的其他标注
+1. deterministic  定数性标注
+2. stateful 标注
+3. 唯一性标注
+宏命令
+
+streaming 
+streaming采用管道的方式 来把数据传递给这个进程
+
+
+hadoop inputformat 将不同的数据格式转化成输入
+       outputformat 
+       可以进行设计实现存储中读取和存放数据
+hiveStorgeHandler 连接Hbase Cassandra
+定制的InputFormat outputformat
+DynamoDB 必须有一个主键 一个舒心和任意数量的属性值
+hive 可以查询DynamoDB中的数据 将数据导入S3中
+hive 有用户 组 角色授予或者回收权限
+show grant user hadoop on database default
+分区表是可以在分区级别进行权限授予
+将表属性 Partition_Level_privilege=true
+hive 结合zookeeper支持锁功能
+zookeeper
+显示锁和独占锁 
+自动获取锁
+show locks
+unlock table people 
+question::是否有zookeeper锁的需要
+
+ooize工作流任务是一系列的有向无环图
+根据需要进行触发的
+Oozie基于参数定义工作流
+Ooize的多种Action
+1.mapreduce
+2.shell
+3.Java
+4.java 
+5.Hive 
+6.DistCp 
+工作流 使用xml配置
+Oozie 可以获得操作细节方便错误定位
+HCatalog  
+方便用户在不同的工具之间共享元数据库
+hcat 命令行 大部分的ddl操作
+
+
+
+
+查询pv uv的例子
+select get_json_object(behavior_json, '$.cnt'), count(*), count(Distinct anid) 
+from mobula_data.behavior_log_raw
+where get_json_object(behavior_json, '$.key') =  'fsacc' and apppkg = 'com.gamepig.rush' 
+and day between '20180909' and '20180909'
+group by  get_json_object(behavior_json, '$.cnt')
+
